@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 
 import './App.css';
+import { thisTypeAnnotation } from '@babel/types';
 
 const CancelToken = axios.CancelToken;
 const source = CancelToken.source();
@@ -24,6 +25,7 @@ class App extends React.Component {
     };
   }
   componentDidMount() {
+    this.mount = true;
     this.setState({
       category: {
         isLoading: true,
@@ -33,27 +35,30 @@ class App extends React.Component {
     },()=>{
       axios.get("http://stream-restaurant-menu-svc.herokuapp.com/category",{cancelToken: source.token})
       .then(res => {
-        this.setState({
-          category: {
-            isLoading: false,
-            data: res.data,
-            error: null
-          }
+        if(this.mount){
+          this.setState({
+            category: {
+              isLoading: false,
+              data: res.data,
+              error: null
+            }
         });
-      })
+      }})
       .catch(error => {
-        this.setState({
-          category: {
-            isLoading: false,
-            error: error,
-          }
-        });
-      });
+          if(this.mount){
+            this.setState({
+              category: {
+                isLoading: false,
+                error: error,
+              }
+          });
+      }});
     });
 
   }
 
   componentWillUnmount(){
+    this.mount=false;
     source.cancel('Customer Exit!');
   }
   
@@ -68,30 +73,31 @@ class App extends React.Component {
     });
     axios.get(`https://stream-restaurant-menu-svc.herokuapp.com/item?category=${sn}`,{cancelToken: source.token})
       .then(res => {
-        // console.log(res);
-        this.setState(
-          {
-            detail: {
-              isLoading: false,
-              sn: sn,
-              data: res.data,
-              error: null
+        if(this.mount){
+          this.setState(
+            {
+              detail: {
+                isLoading: false,
+                sn: sn,
+                data: res.data,
+                error: null
+              }
             }
-          }
-        );
-      })
+          );
+      }})
       .catch(error => {
-        this.setState(
-          {
-            detail: {
-              isLoading: false,
-              sn: this.state.detail.sn,
-              data: this.state.detail.data,
-              error: error
+        if(this.mount){
+          this.setState(
+            {
+              detail: {
+                isLoading: false,
+                sn: this.state.detail.sn,
+                data: this.state.detail.data,
+                error: error
+              }
             }
-          }
-        );
-      });
+          );
+      }});
   };
 
   render() {
