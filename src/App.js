@@ -30,8 +30,8 @@ class App extends React.Component {
         data: this.state.category.data,
         error: null
       }
-    });
-    axios.get("http://stream-restaurant-menu-svc.herokuapp.com/category",{cancelToken: source.token})
+    },()=>{
+      axios.get("http://stream-restaurant-menu-svc.herokuapp.com/category",{cancelToken: source.token})
       .then(res => {
         this.setState({
           category: {
@@ -49,11 +49,14 @@ class App extends React.Component {
           }
         });
       });
+    });
+
   }
 
   componentWillUnmount(){
     source.cancel('Customer Exit!');
   }
+  
   handleClick = (sn) => {
     this.setState({
       detail: {
